@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Gloock&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Gothic+A1:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gothic+A1:wght@100;200;300;400;500;600;700;800;900&family=Kalnia:wght@600;700&display=swap');
+
 
 html{
     font-family: 'Gothic A1', serif;
@@ -25,28 +27,69 @@ html{
 }
 
 h1{
-    font-size: 3em;
-    font-weight: 900;
-    text-align: center;
-}
-
-h2{
-    text-align: center;
-}
-
-h2{
+    font-size: 5em;
     font-weight: 600;
+    text-align: center;
+    color: rgb(58, 96, 74);
+    /* line-height:2vh; */
+    margin-bottom: auto;
+    font-family: 'Times';
+
+}
+
+h2{
+    text-align: center;
+    font-family: 'Times';
+    font-size: 2em;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: auto;
 }
 
 p{
     font-size: 1.25em;
-    font-weight: 200;
+    font-weight: 400;
+    text-align: center;
+    color: rgb(58, 96, 74);
+    line-height: 1.5;
+
 }
 
 .subtext{
     text-align: center;
-    color: rgb(146, 144, 144);
+    color: rgb(84, 83, 83);
+    font-weight: 200;
+    /* font-style: italic; */
 }
+
+footer{
+    text-align: center;
+    color: rgb(120, 120, 120);
+    font-weight: 200;
+    font-size: 1.2em;
+}
+
+hr{
+    width: 75%;
+    
+}
+
+a{
+    text-decoration: none;
+    color: rgb(125, 63, 122);
+    font-weight: 400;
+}
+
+
+
+a:hover{
+    color: rgb(169, 79, 164);
+}
+
+.emoji-spacer{
+    letter-spacing: 1rem;
+}
+
 
 @media (max-width: 800px) {
     .container-flex {
@@ -56,4 +99,10 @@ p{
     .container-flex img{
         width: 100%;
     }
+
+    hr{
+        width: 80%;
+        
+    }
+    
   }
