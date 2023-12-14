@@ -1,12 +1,59 @@
 @import url('https://fonts.googleapis.com/css2?family=Gloock&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gothic+A1:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 html{
-    font-family: 'Gloock', serif;
-    background: rgb(253, 254, 246);
+    font-family: 'Gothic A1', serif;
+    /* font-family: century-gothic, sans-serif; */
+    background: rgb(247, 247, 245);
+ 
 }
 
 .container {
-    display: flex; /* or inline-flex */
+    /* display: flex; or inline-flex */
     justify-content: center;
    
+  }
+
+.container-flex {
+    display: flex; 
+    /* or inline-flex */
+    justify-content: space-evenly;
+    flex-wrap:wrap;
+    /* flex-direction: row  */
+
+   
+}
+
+h1{
+    font-size: 3em;
+    font-weight: 900;
+    text-align: center;
+}
+
+h2{
+    text-align: center;
+}
+
+h2{
+    font-weight: 600;
+}
+
+p{
+    font-size: 1.25em;
+    font-weight: 200;
+}
+
+.subtext{
+    text-align: center;
+    color: rgb(146, 144, 144);
+}
+
+@media (max-width: 800px) {
+    .container-flex {
+      flex-direction: column;
+    }
+
+    .container-flex img{
+        width: 100%;
+    }
   }
