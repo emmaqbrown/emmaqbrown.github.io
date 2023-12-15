@@ -138,8 +138,21 @@ a:hover{
         width: 60%;
     }
 
-    /* h1{
+    h1{
         font-size: 7em;
-    } */
+    }
+
+    h2{
+        font-size:4rem;
+    }
+
+    p{
+        font-size: 3rem;
+
+    }
+
+    footer{
+        font-size: 2rem;
+    }
     
   }
