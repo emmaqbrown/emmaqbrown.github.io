@@ -97,13 +97,15 @@ a:hover{
 }
 
 
-@media (max-width: 800px) {
+@media (max-width: 1200px) {
     .container-flex {
       flex-direction: column;
+      margin: auto;
     }
 
     .container-flex img{
         width: 100%;
+        margin: auto;
     }
 
     hr{
