@@ -98,6 +98,10 @@ a:hover{
     letter-spacing: 1rem;
 }
 
+/* #bar-everyday{
+    width: 100%;
+} */
+
 
 @media (max-width: 1250px) {
     .container-flex {
@@ -114,9 +118,9 @@ a:hover{
         width: 80%;
         
     }
-    img{
+    /* img{
         margin:auto;
-    }
+    } */
 
     #pie{
         width: 60%;
