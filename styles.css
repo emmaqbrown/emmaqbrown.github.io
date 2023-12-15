@@ -24,6 +24,8 @@ html{
     flex-wrap:wrap;
     /* flex-direction: row  */
     margin: auto;
+    flex-direction: column;
+
 
    
 }
@@ -97,7 +99,7 @@ a:hover{
 }
 
 
-@media (max-width: 1200px) {
+@media (max-width: 1250px) {
     .container-flex {
       flex-direction: column;
       margin: auto;
@@ -111,6 +113,13 @@ a:hover{
     hr{
         width: 80%;
         
+    }
+    img{
+        margin:auto;
+    }
+
+    #pie{
+        width: 60%;
     }
     
   }
