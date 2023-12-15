@@ -31,7 +31,7 @@ html{
 }
 
 h1{
-    font-size: 5em;
+    font-size: 5rem;
     font-weight: 600;
     text-align: center;
     color: rgb(58, 96, 74);
@@ -44,15 +44,16 @@ h1{
 h2{
     text-align: center;
     font-family: 'Times';
-    font-size: 2em;
+    font-size: 2rem;
     font-weight: 600;
     line-height: 1;
     margin-bottom: auto;
 }
 
 p{
-    font-size: 1.25em;
-    font-weight: 400;
+    
+    font-size: 1.25rem;
+    font-weight: 600;
     text-align: center;
     color: rgb(58, 96, 74);
     line-height: 1.5;
@@ -66,11 +67,17 @@ p{
     /* font-style: italic; */
 }
 
+#intro-text{
+    font-family: 'Times';
+ 
+}
+
 footer{
     text-align: center;
     color: rgb(120, 120, 120);
     font-weight: 200;
-    font-size: 1.2em;
+    font-size: 1.2rem;
+    margin-bottom: 25px;
 }
 
 img{
@@ -102,6 +109,11 @@ a:hover{
     width: 100%;
 } */
 
+#eqb{
+    font-family: 'Times';
+    font-weight: 200;
+}
+
 
 @media (max-width: 1250px) {
     .container-flex {
@@ -125,5 +137,9 @@ a:hover{
     #pie{
         width: 60%;
     }
+
+    /* h1{
+        font-size: 7em;
+    } */
     
   }
