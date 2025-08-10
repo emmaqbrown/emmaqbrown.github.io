@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Arrow Key Game with Distractions</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .player, .friend {
+      border-radius: 50%;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .player {
+      background-color: blue;
+      width: 40px;
+      height: 40px;
+    }
+
+    .friend {
+      background-color: green;
+      width: 50px;
+      height: 50px;
+    }
+
+    /* Distraction Modal */
+    #distractionModal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 10px;
+      z-index: 1000;
+    }
+
+    #distractionModal p {
+      margin-bottom: 15px;
+    }
+
+    #distractionModal button {
+      margin-right: 10px;
+      padding: 8px 20px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    #distractionModal button#noHint {
+      background-color: #c2c2c2;
+      color: white;
+    }
+
+
+
+    #distractionModal button:hover {
+      background-color: #0056b3;
+    }
+
+    .wall {
+      position: absolute;
+      background: #444;
+      border-radius: 8px;
+      z-index: 900;
+    }
+
+    .hintBox {
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="player" id="player"></div>
+  <div class="friend" id="friend"></div>
+
+  <!-- Distraction Modal -->
+  <div id="distractionModal">
+    <p>❓ Do you want a hint?</p>
+    <button onclick="handleDistraction('respond')">Yes</button>
+    <button id="noHint" onclick="handleDistraction('ignore')">No</button>
+  </div>
+
+  <script>
+    const player = document.getElementById("player");
+    const friend = document.getElementById("friend");
+
+    let playerX = 100;
+    let playerY = 100;
+
+    function updatePlayerPosition() {
+      player.style.left = `${playerX}px`;
+      player.style.top = `${playerY}px`;
+    }
+
+    function placeFriend() {
+      const friendSize = 50;
+      let placed = false;
+      let attempts = 0;
+      while (!placed && attempts < 100) {
+        // Right side: between 2/3 and full width
+        const minX = Math.floor(window.innerWidth * 0.66);
+        const maxX = window.innerWidth - friendSize;
+        const x = Math.floor(Math.random() * (maxX - minX)) + minX;
+        const y = Math.floor(Math.random() * (window.innerHeight - friendSize));
+
+        // Check collision with walls
+        const friendRect = { left: x, top: y, right: x + friendSize, bottom: y + friendSize };
+        let collides = false;
+        for (const wall of window.walls || []) {
+          const wallRect = wall.getBoundingClientRect();
+          if (
+            friendRect.left < wallRect.right &&
+            friendRect.right > wallRect.left &&
+            friendRect.top < wallRect.bottom &&
+            friendRect.bottom > wallRect.top
+          ) {
+            collides = true;
+            break;
+          }
+        }
+        if (!collides) {
+          friend.style.left = `${x}px`;
+          friend.style.top = `${y}px`;
+          placed = true;
+        }
+        attempts++;
+      }
+    }
+
+    function placePlayer() {
+      const playerSize = 40;
+      let placed = false;
+      let attempts = 0;
+      while (!placed && attempts < 100) {
+        // Near top left: x and y between 10 and 60
+        const x = Math.floor(Math.random() * playerSize) + 10;
+        const y = Math.floor(Math.random() * playerSize) + 10;
+
+        // Check collision with walls
+        const playerRect = { left: x, top: y, right: x + playerSize, bottom: y + playerSize };
+        let collides = false;
+        for (const wall of window.walls || []) {
+          const wallRect = wall.getBoundingClientRect();
+          if (
+            playerRect.left < wallRect.right &&
+            playerRect.right > wallRect.left &&
+            playerRect.top < wallRect.bottom &&
+            playerRect.bottom > wallRect.top
+          ) {
+            collides = true;
+            break;
+          }
+        }
+        if (!collides) {
+          playerX = x;
+          playerY = y;
+          updatePlayerPosition();
+          placed = true;
+        }
+        attempts++;
+      }
+    }
+
+    // Initialize
+    updatePlayerPosition();
+    createRandomWalls(30); // Add 5 random walls
+    placePlayer();
+
+    placeFriend();
+
+   
+    let distractionInterval = 6000; // Initial delay in milliseconds
+
+    function showDistractionModal() {
+      if (!isAlertActive) {
+        document.getElementById("distractionModal").style.display = "block";
+        isAlertActive = true;
+      }
+    }
+
+    function getHintDirection() {
+      const step = 40; // Same as player size
+      const directions = [
+        { name: "up", dx: 0, dy: -step },
+        { name: "down", dx: 0, dy: step },
+        { name: "left", dx: -step, dy: 0 },
+        { name: "right", dx: step, dy: 0 }
+      ];
+
+      // Get friend's center position
+      const friendRect = friend.getBoundingClientRect();
+      const friendCenterX = friendRect.left + friendRect.width / 2;
+      const friendCenterY = friendRect.top + friendRect.height / 2;
+
+      // Calculate best direction
+      let bestDir = null;
+      let minDist = Infinity;
+      for (const dir of directions) {
+        const newX = playerX + dir.dx;
+        const newY = playerY + dir.dy;
+        if (
+          newX >= 0 &&
+          newY >= 0 &&
+          newX <= window.innerWidth - step &&
+          newY <= window.innerHeight - step &&
+          !collidesWithWall(newX, newY)
+        ) {
+          // Distance from new position to friend
+          const dist = Math.hypot(
+            (newX + step / 2) - friendCenterX,
+            (newY + step / 2) - friendCenterY
+          );
+          if (dist < minDist) {
+            minDist = dist;
+            bestDir = dir.name;
+          }
+        }
+      }
+      return bestDir ? `Go ${bestDir}` : "No clear direction!";
+    }
+
+    function showHint() {
+      const hintWidth = 200;
+      const hintHeight = 100;
+      let placed = false;
+      let attempts = 0;
+
+      // Get player's current position
+      const playerRect = player.getBoundingClientRect();
+      const playerCenterX = playerRect.left + playerRect.width / 2;
+      const playerCenterY = playerRect.top + playerRect.height / 2;
+
+      while (!placed && attempts < 100) {
+        // Generate random offset within ±200 pixels
+        const offsetX = Math.floor(Math.random() * 401) - 200;
+        const offsetY = Math.floor(Math.random() * 401) - 200;
+
+        let hintX = playerCenterX + offsetX;
+        let hintY = playerCenterY + offsetY;
+
+        // Clamp to window boundaries
+        const maxX = window.innerWidth - hintWidth;
+        const maxY = window.innerHeight - hintHeight;
+        hintX = Math.max(0, Math.min(maxX, hintX));
+        hintY = Math.max(0, Math.min(maxY, hintY));
+
+        // Check for overlap with existing hints
+        let collides = false;
+        const existingHints = document.querySelectorAll('.hintBox');
+        for (const hintEl of existingHints) {
+          // Use the style.left/top and style.width/height for overlap math
+          const existingX = parseInt(hintEl.style.left, 10);
+          const existingY = parseInt(hintEl.style.top, 10);
+          const existingWidth = parseInt(hintEl.style.width, 10) || hintWidth;
+          const existingHeight = parseInt(hintEl.style.height, 10) || hintHeight;
+
+          if (
+            hintX < existingX + existingWidth &&
+            hintX + hintWidth > existingX &&
+            hintY < existingY + existingHeight &&
+            hintY + hintHeight > existingY
+          ) {
+            collides = true;
+            break;
+          }
+        }
+
+        const hintText = getHintDirection(); // Get direction hint
+
+
+        if (!collides) {
+          const hint = document.createElement("div");
+          hint.className = "hintBox\n";
+          hint.textContent = "Hint";
+          hint.style.position = "fixed";
+          hint.style.background = "#ffe066";
+          hint.style.color = "#333";
+          hint.style.textAlign ="center";
+          hint.style.padding = "20px";
+          hint.style.borderRadius = "8px";
+          hint.style.fontWeight = "bold";
+          hint.style.zIndex = "1100";
+          hint.style.left = `${hintX}px`;
+          hint.style.top = `${hintY}px`;
+          hint.style.width = `${hintWidth}px`;
+          hint.style.height = `${hintHeight}px`;
+
+          // Unbolded paragraph for hintText
+          const hintPara = document.createElement("p");
+          hintPara.textContent = hintText;
+          hintPara.style.fontWeight = "normal";
+          hintPara.style.marginTop = "12px";
+          hint.appendChild(hintPara);
+
+          document.body.appendChild(hint);
+          placed = true;
+        }
+        attempts++;
+      }
+    }
+
+  // Update handleDistraction to show hint on "respond"
+  function handleDistraction(type) {
+    if (type === 'respond') {
+      distractionInterval = distractionInterval - 100;
+      showHint(); // <-- Add this line
+    } else if (type === 'ignore') {
+      distractionInterval =  distractionInterval + 100;
+    }
+
+    document.getElementById("distractionModal").style.display = "none";
+    isAlertActive = false;
+
+    clearTimeout(distractionTimeout);
+    distractionTimeout = setTimeout(showDistractionModal, distractionInterval);
+    console.log(distractionInterval)
+  }
+
+    let isAlertActive = false;
+    let distractionTimeout = setTimeout(showDistractionModal, distractionInterval);
+
+    // Movement with Arrow Keys
+    document.addEventListener("keydown", (e) => {
+      if (isAlertActive) return; // Prevent movement when modal is active
+
+        let newX = playerX;
+        let newY = playerY;
+        switch (e.key) {
+          case "w":
+            newY -= 10;
+            break;
+          case "s":
+            newY += 10;
+            break;
+          case "a":
+            newX -= 10;
+            break;
+          case "d":
+            newX += 10;
+            break;
+        }
+
+
+      // Clamp to screen boundaries
+      const maxX = window.innerWidth - 50;
+      const maxY = window.innerHeight - 50;
+      newX = Math.max(0, Math.min(maxX, newX));
+      newY = Math.max(0, Math.min(maxY, newY));
+
+      // Only move if not colliding with a wall
+      if (!collidesWithWall(newX, newY)) {
+        playerX = newX;
+        playerY = newY;
+        updatePlayerPosition();
+        checkCollision();
+      }
+    });
+
+    
+    function createRandomWalls(numWalls = 5) {
+      window.walls = [];
+      for (let i = 0; i < numWalls; i++) {
+        let placed = false;
+        let attempts = 0;
+        while (!placed && attempts < 100) {
+          const width = Math.floor(Math.random() * 100) + 50;
+          const height = Math.floor(Math.random() * 100) + 50;
+          const left = Math.floor(Math.random() * (window.innerWidth - width));
+          const top = Math.floor(Math.random() * (window.innerHeight - height));
+          const newRect = { left, top, right: left + width, bottom: top + height };
+
+          // Check for overlap with existing walls
+          let collides = false;
+          for (const wall of window.walls) {
+            const wallRect = wall.getBoundingClientRect();
+            if (
+              newRect.left < wallRect.right &&
+              newRect.right > wallRect.left &&
+              newRect.top < wallRect.bottom &&
+              newRect.bottom > wallRect.top
+            ) {
+              collides = true;
+              break;
+            }
+          }
+
+          if (!collides) {
+            const wall = document.createElement("div");
+            wall.className = "wall";
+            wall.style.position = "absolute";
+            wall.style.left = `${left}px`;
+            wall.style.top = `${top}px`;
+            wall.style.width = `${width}px`;
+            wall.style.height = `${height}px`;
+            wall.style.background = "#444";
+            wall.style.borderRadius = "8px";
+            wall.style.zIndex = "900";
+            document.body.appendChild(wall);
+            window.walls.push(wall);
+            placed = true;
+          }
+          attempts++;
+        }
+      }
+    }
+
+    function collidesWithWall(x, y) {
+      const playerSize = 40; // Match CSS
+
+      const playerRect = {
+        left: x,
+        top: y,
+        right: x + playerSize,
+        bottom: y + playerSize
+      };
+      for (const wall of window.walls || []) {
+        const wallRect = wall.getBoundingClientRect();
+        if (
+          playerRect.left < wallRect.right &&
+          playerRect.right > wallRect.left &&
+          playerRect.top < wallRect.bottom &&
+          playerRect.bottom > wallRect.top
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function showWinMessage() {
+      // Remove any existing win message
+      const oldWin = document.getElementById("winMessage");
+      if (oldWin) oldWin.remove();
+
+      const win = document.createElement("div");
+      win.id = "winMessage";
+      win.textContent = "You Win!";
+      win.style.position = "fixed";
+      win.style.left = "50%";
+      win.style.top = "50%";
+      win.style.transform = "translate(-50%, -50%)";
+      win.style.background = "#28a745";
+      win.style.color = "white";
+      win.style.padding = "48px 96px";
+      win.style.borderRadius = "16px";
+      win.style.fontSize = "3rem";
+      win.style.fontWeight = "bold";
+      win.style.zIndex = "2000";
+      win.style.boxShadow = "0 4px 24px rgba(0,0,0,0.2)";
+      document.body.appendChild(win);
+    }
+
+
+    function checkCollision() {
+      const playerRect = player.getBoundingClientRect();
+      const friendRect = friend.getBoundingClientRect();
+
+      if (
+        playerRect.left < friendRect.right &&
+        playerRect.right > friendRect.left &&
+        playerRect.top < friendRect.bottom &&
+        playerRect.bottom > friendRect.top
+      ) {
+        // Collision detected, reset game or handle as needed
+        showWinMessage();
+      }
+    }
+  </script>
+</body>
+</html>
