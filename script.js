@@ -220,17 +220,17 @@ document.addEventListener("keydown", (e) => {
     let newX = playerX;
     let newY = playerY;
     switch (e.key) {
-        case "w":
+        case "ArrowUp":
             newY -= 10;
         break;
 
-        case "s":
+        case "ArrowDown":
             newY += 10;
         break;
-        case "a":
+        case "ArrowLeft":
         newX -= 10;
         break;
-        case "d":
+        case "ArrowRight":
         newX += 10;
         break;
     }
