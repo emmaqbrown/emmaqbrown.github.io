@@ -217,78 +217,98 @@ function handleAnimationEnd() {
 distractionTimeout = setTimeout(showDistractionModal, distractionInterval);
 
 // Movement with Arrow Keys
+// document.addEventListener("keydown", (e) => {
+//     if (isAlertActive || !start) return; // Prevent movement when modal is active
+
+//     let newX = playerX;
+//     let newY = playerY;
+//     switch (e.key) {
+//         case "ArrowUp":
+//             newY -= 10;
+//         break;
+
+//         case "ArrowDown":
+//             newY += 10;
+//         break;
+//         case "ArrowLeft":
+//         newX -= 10;
+//         break;
+//         case "ArrowRight":
+//         newX += 10;
+//         break;
+//     }
+
+//     // Clamp to screen boundaries
+//     const maxX = window.innerWidth - 50;
+//     const maxY = window.innerHeight - 50;
+//     newX = Math.max(0, Math.min(maxX, newX));
+//     newY = Math.max(0, Math.min(maxY, newY));
+
+//     // Only move if not colliding with a wall
+//     if (!collidesWithWall(newX, newY)) {
+//     playerX = newX;
+//     playerY = newY;
+//     updatePlayerPosition();
+//     checkCollision();
+//     }
+// });
+
+let keys = {};
+
 document.addEventListener("keydown", (e) => {
-    if (isAlertActive || !start) return; // Prevent movement when modal is active
+    keys[e.key] = true;
+});
+
+document.addEventListener("keyup", (e) => {
+    keys[e.key] = false;
+});
+
+function playerMovement() {
+    // Calculate the new potential position
+    
 
     let newX = playerX;
     let newY = playerY;
-    switch (e.key) {
-        case "ArrowUp":
-            newY -= 10;
-        break;
 
-        case "ArrowDown":
-            newY += 10;
-        break;
-        case "ArrowLeft":
-        newX -= 10;
-        break;
-        case "ArrowRight":
-        newX += 10;
-        break;
+    if (keys['ArrowUp']) {
+        newY -= 3;
+    }
+    if (keys['ArrowDown']) {
+        newY += 3;
+    }
+    if (keys['ArrowLeft']) {
+        newX -= 3;
+    }
+    if (keys['ArrowRight']) {
+        newX += 3;
     }
 
-    // Clamp to screen boundaries
-    const maxX = window.innerWidth - 50;
-    const maxY = window.innerHeight - 50;
-    newX = Math.max(0, Math.min(maxX, newX));
-    newY = Math.max(0, Math.min(maxY, newY));
+    // Clamp the new potential position to screen boundaries
+    const screenWidth = ipadScreen.clientWidth -50;
+    const screenHeight = ipadScreen.clientHeight -50;
+    newX = Math.max(0, Math.min(screenWidth, newX));
+    newY = Math.max(0, Math.min(screenHeight, newY));
 
-    // Only move if not colliding with a wall
+    console.log(screenWidth,screenHeight)
+    console.log(newX, newY)
+
+    // Only update player's actual position if the new position is valid
     if (!collidesWithWall(newX, newY)) {
-    playerX = newX;
-    playerY = newY;
+        if (!isAlertActive || start )
+            playerX = newX;
+            playerY = newY;
+    }
+    
+    // Call your existing functions to update the player's position on screen
     updatePlayerPosition();
     checkCollision();
-    }
-});
 
-let touchStartX = null;
-let touchStartY = null;
-
-function handleTouchStart(e) {
-    const t = e.touches[0];
-    touchStartX = t.clientX;
-    touchStartY = t.clientY;
+    // Request the next animation frame to continue the loop
+    requestAnimationFrame(playerMovement);
 }
 
-function handleTouchEnd(e) {
-    if (touchStartX === null || touchStartY === null) return;
-
-    const t = e.changedTouches[0];
-    const dx = t.clientX - touchStartX;
-    const dy = t.clientY - touchStartY;
-    const absDx = Math.abs(dx), absDy = Math.abs(dy);
-
-    // Threshold so accidental taps don’t trigger
-    if (Math.max(absDx, absDy) < 30) return;
-
-    let key = null;
-    if (absDx > absDy) {
-        key = dx > 0 ? 'd' : 'a';
-    } else {
-        key = dy > 0 ? 's' : 'w';
-    }
-
-    const event = new KeyboardEvent('keydown', { key });
-    document.dispatchEvent(event);
-
-    touchStartX = touchStartY = null;
-}
-
-document.addEventListener('touchstart', handleTouchStart, {passive: true});
-document.addEventListener('touchend', handleTouchEnd);
-
+// Start the game loop
+requestAnimationFrame(playerMovement);
 
 
 function createRandomWalls(numWalls = 5) {
