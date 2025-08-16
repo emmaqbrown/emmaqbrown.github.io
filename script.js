@@ -12,6 +12,36 @@ let hideDistractionTime = 2000;
 let distractionInterval = 10000;
 let emojiIndex = 0;
 
+let text_options_index = 0;
+let textOptions = [
+    "98% of Americans now own a smartphone",
+    "9 in 10 teens use Youtube",
+    "73% of teens report using Youtube daily",
+    "1/3 of teens report using social media almost constantly",
+    "46% of teens report using the internet almost constantly",
+    "4 in 10 adults report using the internet almost constantly",
+    "48% of teens report social media as negatively affecting people their age"
+];
+
+shuffleArray(textOptions);
+
+function shuffleArray(array) {
+  let currentIndex = array.length;
+  let randomIndex;
+
+  // While there remain elements to shuffle.
+  while (currentIndex !== 0) {
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
+
 function getIpadRect() {
     return ipadScreen.getBoundingClientRect();
 }
@@ -144,26 +174,21 @@ let distractionTimeout;
 
 
 
-
 function showDistractionModal() {
     if (!isAlertActive & start) {
         document.getElementById("distractionModal").style.display = "block";
         isAlertActive = true;
 
-        const textOptions = [
-            "98% of Americans now own a smartphone",
-            "9 in 10 teens use Youtube",
-            "73% of teens report using Youtube daily",
-            "1/3 of teens report using social media almost constantly",
-            "46% of teens report using the internet almost constantly",
-            "4 in 10 adults report using the internet almost constantly",
-            "48% of teens report social media as negatively affecting people their age"
-        ];
+        
 
-        document.getElementById("notification-text").textContent = textOptions[Math.floor(Math.random() * textOptions.length)];
 
+        document.getElementById("notification-text").textContent = textOptions[text_options_index];
+        text_options_index = (text_options_index + 1) % textOptions.length;
+        console.log(text_options_index)
         // Hide after 0.5 seconds
         setTimeout(hideDistractionModal, hideDistractionTime);
+
+
     }
 }
 
@@ -359,7 +384,7 @@ function createRandomWalls(numWalls = 5) {
                 // Add a random app icon emoji
                 const icon = document.createElement("span");
                 icon.className = "icon";
-                console.log(emojiIndex)
+                // console.log(emojiIndex)
                 icon.textContent = appEmojis[emojiIndex];
                 wall.appendChild(icon);
                 emojiIndex = (emojiIndex + 1) % appEmojis.length;
