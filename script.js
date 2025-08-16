@@ -25,6 +25,9 @@ let textOptions = [
 
 shuffleArray(textOptions);
 
+    const appEmojis = ["📞", "💬", "🎵", "📍","🗺️", "⏰", "📷", "📝", "📚", "🎮", "📆", "🚕", "🌤️", "✉️", "🕑", "🔊","💳"];
+
+
 function shuffleArray(array) {
   let currentIndex = array.length;
   let randomIndex;
@@ -367,7 +370,6 @@ function createRandomWalls(numWalls = 5) {
             }
 
             if (!collides) {
-                const appEmojis = ["📞", "💬", "🎵", "🗺️", "📷", "📝", "📚", "🎮", "📆", "🚕", "☁️", "✉️", "🕑", "💳"];
                 const wall = document.createElement("div");
                 // After creating and appending each wall:
                 wall.vx = (Math.random() - 0.5) * 2; // Random velocity X
