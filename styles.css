@@ -11,7 +11,7 @@ body {
 #ipadScreen {
     position: relative;
     width: 1000px;
-    height: 800px;
+    height: 700px;
     background: #000;
     border-radius: 48px;
     box-shadow: 0 8px 48px rgba(0,0,0,0.7);
