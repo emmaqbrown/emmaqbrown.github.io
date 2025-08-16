@@ -270,33 +270,33 @@ function playerMovement() {
     let newX = playerX;
     let newY = playerY;
 
-    if (keys['ArrowUp']) {
+    if (!isAlertActive && start){
+        if (keys['ArrowUp']  ) {
         newY -= 3;
-    }
-    if (keys['ArrowDown']) {
-        newY += 3;
-    }
-    if (keys['ArrowLeft']) {
-        newX -= 3;
-    }
-    if (keys['ArrowRight']) {
-        newX += 3;
+        }
+        if (keys['ArrowDown'] ) {
+            newY += 3;
+        }
+        if (keys['ArrowLeft']  ) {
+            newX -= 3;
+        }
+        if (keys['ArrowRight']  ) {
+            newX += 3;
+        }
+
+        // Clamp the new potential position to screen boundaries
+        const screenWidth = ipadScreen.clientWidth -50;
+        const screenHeight = ipadScreen.clientHeight -50;
+        newX = Math.max(0, Math.min(screenWidth, newX));
+        newY = Math.max(0, Math.min(screenHeight, newY));
     }
 
-    // Clamp the new potential position to screen boundaries
-    const screenWidth = ipadScreen.clientWidth -50;
-    const screenHeight = ipadScreen.clientHeight -50;
-    newX = Math.max(0, Math.min(screenWidth, newX));
-    newY = Math.max(0, Math.min(screenHeight, newY));
 
-    console.log(screenWidth,screenHeight)
-    console.log(newX, newY)
 
     // Only update player's actual position if the new position is valid
     if (!collidesWithWall(newX, newY)) {
-        if (!isAlertActive || start )
-            playerX = newX;
-            playerY = newY;
+        playerX = newX;
+        playerY = newY;
     }
     
     // Call your existing functions to update the player's position on screen
@@ -542,7 +542,7 @@ function startTimer() {
             document.getElementById("end-text").textContent = 'You failed to escape the digital world.';
             showWinMessage();
         }
-    }, 20000); 
+    }, 60000); 
 }
 
 function animateWalls() {
