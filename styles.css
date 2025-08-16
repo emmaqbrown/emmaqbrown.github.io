@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: "Futura", "Helvetica Neue", sans-serif;
     background: #222; /* dark background outside iPad */
     min-height: 100vh;
     display: flex;
@@ -16,66 +16,136 @@ body {
     border-radius: 48px;
     box-shadow: 0 8px 48px rgba(0,0,0,0.7);
     overflow: hidden;
-    border: 8px solid #222;
+    border: 8px solid #404040;
 }
+
+/* Styling for the full-screen overlay */
+#welcome-screen {
+  position: fixed; /* Stays in place regardless of scrolling */
+  top: 50%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%); /* Adjust for perfect centering */
+  width: 90%; /* Responsive width */
+  max-width: 800px; /* Maximum size */
+  
+  /* Frosted glass effect */
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  
+  border-radius: 20px; /* Rounded corners */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  color: #333; /* Dark text for contrast */
+  text-align: center;
+  padding: 20px;
+
+
+  z-index: 2000; /* Ensures it's on top of other elements */
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* Styling for the content within the welcome screen */
+.welcome-content {
+  padding: 20px;
+  max-width: 800px;
+}
+
+.welcome-content, p{
+  font-size: 1.25em;
+}
+
+.welcome-content, i{
+  font-size: 1em;
+}
+
+/* Styling for the Start button */
+#startButton {
+  padding: 10px 20px;
+  font-size: 1em;
+  cursor: pointer;
+  background-color: #007aff; /* Apple's signature blue */
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+#startButton:hover {
+  background-color: #0056b3;
+}
+
 
 .player, .friend {
     border-radius: 50%;
     position: absolute;
     pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem; /* Make emoji large */
+    background: none; /* Remove background color */
+    opacity: 0.3
+}
+
+.player{
+  z-index: 1000;
+  transform: rotate(180deg); /* Rotates the element 45 degrees clockwise */
 }
 
 
 
-.player {
-    background-color: blue;
-    width: 40px;
-    height: 40px;
-}
 
-.friend {
-    background-color: green;
-    width: 50px;
-    height: 50px;
-}
 
 /* Distraction Modal */
+/* Banner-style iPad notification */
 #distractionModal {
     display: none;
-    position: fixed;
-    top: 50%;
+    position: absolute;
+    top: 40px;
     left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(255, 255, 255, 0.95);
-    padding: 20px;
-    border-radius: 10px;
-    z-index: 1000;
+    transform: translateX(-50%);
+    min-width: 340px;
+    max-width: 480px;
+    background-color: rgba(255,255,255,0.98);
+    padding: 10px 28px;
+    border-radius: 18px;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.18);
+    z-index: 1200;
+    border: 1px solid #e0e0e0;
+    font-size: 1.15rem;
+    flex-direction: column;
+    align-items: flex-start;
+    animation: slideDown .6s cubic-bezier(.4,0,.2,1);
+}
+
+#distractionModal.slideOut {
+  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateX(-50%) translateY(-30px);}
+    to   { opacity: 1; transform: translateX(-50%) translateY(0);}
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-30px);
+  }
 }
 
 #distractionModal p {
-    margin-bottom: 15px;
+    /* margin-bottom: 12px; */
+    margin-top: 12px;
+    font-size: 1em;
+    font-weight: 400;
 }
 
-#distractionModal button {
-    margin-right: 10px;
-    padding: 8px 20px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-#distractionModal button#noHint {
-    background-color: #c2c2c2;
-    color: white;
-}
-
-
-
-#distractionModal button:hover {
-    background-color: #0056b3;
-}
 
 .wall {
     position: absolute;
@@ -84,47 +154,6 @@ body {
     z-index: 900;
 }
 
-.hintBox {
-    box-sizing: border-box;
-}
-
-.hintBox {
-  position: absolute;
-  background: #f8f8f8;
-  color: #222;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
-  border-radius: 20px;
-  border: 1px solid #e0e0e0;
-  font-weight: 400;
-  font-size: 1.1rem;
-  width: 200px;
-  height: 100px;
-  padding: 0 24px;
-  z-index: 1100;
-}
-
-.hintBox .icon {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-
-.hintBox .textStack {
-  display: flex;
-  flex-direction: column;
-}
-
-.hintBox .title {
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.hintBox .message {
-  font-weight: 400;
-  font-size: 1rem;
-}
 
 .wall {
   position: absolute;
@@ -143,4 +172,34 @@ body {
 }
 .wall .icon {
   pointer-events: none;
+}
+
+#winMessage{
+  display: hidden;
+  opacity: 0;
+
+  position: fixed; /* Stays in place regardless of scrolling */
+  top: 50%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%); /* Adjust for perfect centering */
+  width: 90%; /* Responsive width */
+  max-width: 800px; /* Maximum size */
+
+  
+  /* Frosted glass effect */
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  border-radius: 48px; 
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  color: #333; /* Dark text for contrast */
+  text-align: center;
+  padding: 20px;
+  z-index: 1900; /* Ensures it's on top of other elements */
+}
+
+.winMessage-content {
+  padding: 20px;
+  max-width: 800px;
 }

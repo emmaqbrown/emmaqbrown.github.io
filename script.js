@@ -1,12 +1,46 @@
+let start = false; 
 const ipadScreen = document.getElementById("ipadScreen");
-function getIpadRect() {
-    return ipadScreen.getBoundingClientRect();
-}
+let level = 0; 
+
 const player = document.getElementById("player");
 const friend = document.getElementById("friend");
 
 let playerX = 100;
 let playerY = 100;
+
+let hideDistractionTime = 2000;
+let distractionInterval = 10000;
+let emojiIndex = 0;
+
+function getIpadRect() {
+    return ipadScreen.getBoundingClientRect();
+}
+
+// Get the welcome screen and start button elements
+const welcomeScreen = document.getElementById('welcome-screen');
+const startButton = document.getElementById('startButton');
+
+
+
+// Add a click event listener to the start button
+startButton.addEventListener('click', () => {
+  // Use a smooth fade-out transition
+  welcomeScreen.style.opacity = '0';
+  start = true;
+  player.style.opacity= 1;
+  friend.style.opacity= 1;
+
+  for (const wall of window.walls || []) {
+        wall.style.opacity = 1;
+    }
+
+  // Hide the element completely after the transition ends
+  setTimeout(() => {
+    welcomeScreen.style.display = 'none';
+  }, 500); // This duration should match the CSS transition time
+});
+
+
 
 function updatePlayerPosition() {
     player.style.left = `${playerX}px`;
@@ -94,187 +128,79 @@ function placePlayer() {
     }
 }
 
+
 // Initialize
+
 updatePlayerPosition();
 placePlayer();
 
 placeFriend();
-createRandomWalls(40); // Add 5 random walls
+createRandomWalls(2); // Add 5 random walls
+for (const wall of window.walls || []) {
+    wall.style.opacity = .3;
+}
+let isAlertActive = false;
+let distractionTimeout;
 
 
 
-let distractionInterval = 6000; // Initial delay in milliseconds
 
 function showDistractionModal() {
-    if (!isAlertActive) {
-    document.getElementById("distractionModal").style.display = "block";
-    isAlertActive = true;
+    if (!isAlertActive & start) {
+        document.getElementById("distractionModal").style.display = "block";
+        isAlertActive = true;
+
+        const textOptions = [
+            "98% of Americans now own a smartphone",
+            "9 in 10 teens use Youtube",
+            "73% of teens report using Youtube daily",
+            "1/3 of teens report using social media almost constantly",
+            "46% of teens report using the internet almost constantly",
+            "4 in 10 adults report using the internet almost constantly",
+            "48% of teens report social media as negatively affecting people their age"
+        ];
+
+        document.getElementById("notification-text").textContent = textOptions[Math.floor(Math.random() * textOptions.length)];
+
+        // Hide after 0.5 seconds
+        setTimeout(hideDistractionModal, hideDistractionTime);
     }
 }
 
-function getHintDirection() {
-    const step = 40; // Same as player size
-    const directions = [
-    { name: "up", dx: 0, dy: -step },
-    { name: "down", dx: 0, dy: step },
-    { name: "left", dx: -step, dy: 0 },
-    { name: "right", dx: step, dy: 0 }
-    ];
+function hideDistractionModal() {
+  const modal = document.getElementById("distractionModal");
+  modal.classList.add('slideOut'); // Start the animation
 
-    // Get friend's center position
-    const friendRect = friend.getBoundingClientRect();
-    const friendCenterX = friendRect.left + friendRect.width / 2;
-    const friendCenterY = friendRect.top + friendRect.height / 2;
-
-    // Calculate best direction
-    let bestDir = null;
-    let minDist = Infinity;
-    for (const dir of directions) {
-    const newX = playerX + dir.dx;
-    const newY = playerY + dir.dy;
-    if (
-        newX >= 0 &&
-        newY >= 0 &&
-        newX <= window.innerWidth - step &&
-        newY <= window.innerHeight - step &&
-        !collidesWithWall(newX, newY)
-    ) {
-        // Distance from new position to friend
-        const dist = Math.hypot(
-        (newX + step / 2) - friendCenterX,
-        (newY + step / 2) - friendCenterY
-        );
-        if (dist < minDist) {
-        minDist = dist;
-        bestDir = dir.name;
-        }
-    }
-    }
-    return bestDir ? `Go ${bestDir}` : "No clear direction!";
+  // Use a one-time event listener to wait for the animation to complete
+  modal.addEventListener('animationend', handleAnimationEnd, { once: true });
 }
 
-function showHint() {
-    const hintWidth = 200;
-    const hintHeight = 100;
-    let placed = false;
-    let attempts = 0;
+function handleAnimationEnd() {
+  const modal = document.getElementById("distractionModal");
+  modal.style.display = "none"; // Hide the modal after the animation is finished
+  modal.classList.remove('slideOut'); // Clean up the class for next use
 
-    // Get player's current position
-    const playerRect = player.getBoundingClientRect();
-    const playerCenterX = playerRect.left + playerRect.width / 2;
-    const playerCenterY = playerRect.top + playerRect.height / 2;
-
-    while (!placed && attempts < 100) {
-    // Generate random offset within ±200 pixels
-    const offsetX = Math.floor(Math.random() * 401) - 200;
-    const offsetY = Math.floor(Math.random() * 401) - 200;
-
-    let hintX = playerCenterX + offsetX;
-    let hintY = playerCenterY + offsetY;
-
-    // Clamp to ipadScreen boundaries
-    const maxX = ipadScreen.clientWidth - hintWidth;
-    const maxY = ipadScreen.clientHeight - hintHeight;
-    hintX = Math.max(0, Math.min(maxX, hintX));
-    hintY = Math.max(0, Math.min(maxY, hintY));
-
-    // Check for overlap with existing hints
-    let collides = false;
-    const existingHints = document.querySelectorAll('.hintBox');
-    for (const hintEl of existingHints) {
-        // Use the style.left/top and style.width/height for overlap math
-        const existingX = parseInt(hintEl.style.left, 10);
-        const existingY = parseInt(hintEl.style.top, 10);
-        const existingWidth = parseInt(hintEl.style.width, 10) || hintWidth;
-        const existingHeight = parseInt(hintEl.style.height, 10) || hintHeight;
-
-        if (
-        hintX < existingX + existingWidth &&
-        hintX + hintWidth > existingX &&
-        hintY < existingY + existingHeight &&
-        hintY + hintHeight > existingY
-        ) {
-        collides = true;
-        break;
-        }
-    }
-
-    const hintText = getHintDirection(); // Get direction hint
-
-
-    if (!collides) {
-        const hint = document.createElement("div");
-        hint.className = "hintBox";
-        hint.style.left = `${hintX}px`;
-        hint.style.top = `${hintY}px`;
-
-        // Add a bell icon
-        const notificationEmojis = ["🔔", "💬", "🎵", "✉️"];
-        const icon = document.createElement("span");
-
-        icon.className = "icon";
-        icon.textContent = notificationEmojis[Math.floor(Math.random() * notificationEmojis.length)];
-        hint.appendChild(icon);
-
-        // Notification title
-        const title = document.createElement("div");
-        title.className = "title";
-        title.textContent = "Notification";
-
-        // Notification message
-        const hintPara = document.createElement("div");
-        hintPara.className = "message";
-        hintPara.textContent = hintText;
-
-        // Stack title and message vertically
-        const textStack = document.createElement("div");
-        textStack.className = "textStack";
-        textStack.appendChild(title);
-        textStack.appendChild(hintPara);
-
-        hint.appendChild(textStack);
-
-        ipadScreen.appendChild(hint);
-
-        document.body.appendChild(hint);
-        placed = true;
-    }
-    attempts++;
-    }
+  isAlertActive = false;
+  // Show again after random 1-3 seconds
+  distractionTimeout = setTimeout(showDistractionModal, distractionInterval);
 }
 
-// Update handleDistraction to show hint on "respond"
-function handleDistraction(type) {
-if (type === 'respond') {
-    distractionInterval = distractionInterval - 100;
-    showHint(); // <-- Add this line
-} else if (type === 'ignore') {
-    distractionInterval =  distractionInterval + 100;
-}
-
-document.getElementById("distractionModal").style.display = "none";
-isAlertActive = false;
-
-clearTimeout(distractionTimeout);
+// Start the first timeout (random 1-3 seconds)
 distractionTimeout = setTimeout(showDistractionModal, distractionInterval);
-console.log(distractionInterval)
-}
-
-let isAlertActive = false;
-let distractionTimeout = setTimeout(showDistractionModal, distractionInterval);
 
 // Movement with Arrow Keys
 document.addEventListener("keydown", (e) => {
-    if (isAlertActive) return; // Prevent movement when modal is active
+    if (isAlertActive || !start) return; // Prevent movement when modal is active
 
     let newX = playerX;
     let newY = playerY;
     switch (e.key) {
         case "w":
-        newY -= 10;
+            newY -= 10;
         break;
+
         case "s":
-        newY += 10;
+            newY += 10;
         break;
         case "a":
         newX -= 10;
@@ -283,7 +209,6 @@ document.addEventListener("keydown", (e) => {
         newX += 10;
         break;
     }
-
 
     // Clamp to screen boundaries
     const maxX = window.innerWidth - 50;
@@ -302,6 +227,10 @@ document.addEventListener("keydown", (e) => {
 
 
 function createRandomWalls(numWalls = 5) {
+    for (const wall of window.walls || []) {
+        wall.remove();
+    }
+
     window.walls = [];
     const screenWidth = ipadScreen.clientWidth;
     const screenHeight = ipadScreen.clientHeight;
@@ -376,25 +305,27 @@ function createRandomWalls(numWalls = 5) {
             }
 
             if (!collides) {
-                const appEmojis = ["📚", "🎮", "🎵", "🗺️", "📷", "📝", "🕹️", "📺", "🧩", "🎨", "📡", "🧭", "🛒", "📦", "🗂️"];
+                const appEmojis = ["📞", "💬", "🎵", "🗺️", "📷", "📝", "📚", "🎮", "📆", "🚕", "☁️", "✉️", "🕑", "💳"];
                 const wall = document.createElement("div");
                 // After creating and appending each wall:
                 wall.vx = (Math.random() - 0.5) * 2; // Random velocity X
                 wall.vy = (Math.random() - 0.5) * 2; // Random velocity Y
-                wall.style.opacity = "0.5";
-                wall.fadeInProgress = true;
-                wall.fadeValue = 0.5;
+
                 wall.className = "wall";
                 wall.style.left = `${left}px`;
                 wall.style.top = `${top}px`;
                 wall.style.width = `${width}px`;
                 wall.style.height = `${height}px`;
+                wall.style.zIndex = "1000";
+                wall.style.opacity = 1;
 
                 // Add a random app icon emoji
                 const icon = document.createElement("span");
                 icon.className = "icon";
-                icon.textContent = appEmojis[Math.floor(Math.random() * appEmojis.length)];
+                console.log(emojiIndex)
+                icon.textContent = appEmojis[emojiIndex];
                 wall.appendChild(icon);
+                emojiIndex = (emojiIndex + 1) % appEmojis.length;
 
                 ipadScreen.appendChild(wall);
                 window.walls.push(wall);
@@ -439,27 +370,30 @@ function collidesWithWall(x, y) {
 
 function showWinMessage() {
     // Remove any existing win message
-    const oldWin = document.getElementById("winMessage");
-    if (oldWin) oldWin.remove();
+     for (const wall of window.walls || []) {
+        wall.style.opacity = ".1";
+    }
 
-    const win = document.createElement("div");
-    win.id = "winMessage";
-    win.textContent = "You Win!";
-    win.style.position = "fixed";
-    win.style.left = "50%";
-    win.style.top = "50%";
-    win.style.transform = "translate(-50%, -50%)";
-    win.style.background = "#28a745";
-    win.style.color = "white";
-    win.style.padding = "48px 96px";
-    win.style.borderRadius = "16px";
-    win.style.fontSize = "3rem";
-    win.style.fontWeight = "bold";
-    win.style.zIndex = "2000";
-    win.style.boxShadow = "0 4px 24px rgba(0,0,0,0.2)";
-    document.body.appendChild(win);
+    start = false;
+
+    player.style.opacity = "0.1";
+    friend.style.opacity = "0.1";
+
+
+    const winMessage = document.getElementById("winMessage");
+    winMessage.style.display = "block";
+    winMessage.style.opacity = "1";
+     winMessage.style.zIndex = "2300";
+
 }
 
+
+
+// Variable to hold the timer ID so we can cancel it
+let timer = null; 
+
+// Variable to track if a collision has happened on this level
+let collisionOccurred = false;
 
 function checkCollision() {
     const playerRect = player.getBoundingClientRect();
@@ -472,13 +406,65 @@ function checkCollision() {
     playerRect.bottom > friendRect.top
     ) {
     // Collision detected, reset game or handle as needed
-    showWinMessage();
+        collisionOccurred = true;
+
+        if (level == 0){
+            placePlayer();
+            placeFriend();
+            createRandomWalls(10);
+            hideDistractionTime = 2000;
+            distractionInterval = Math.floor(Math.random() * (7000 - 5000 + 1)) + 5000;
+            collisionOccurred = false;
+        }
+        else if (level ==1){
+            collisionOccurred = false;
+            placePlayer();
+            placeFriend();
+            createRandomWalls(20);
+            hideDistractionTime = 2000;
+            distractionInterval = Math.floor(Math.random() * (5000 - 3000 + 1)) + 3000;
+            collisionOccurred = false;
+
+
+        }
+        else if (level ==2){
+            startTimer();
+            placePlayer();
+            placeFriend();
+            createRandomWalls(40);
+            hideDistractionTime = 2000;
+            distractionInterval = Math.floor(Math.random() * (4000 - 1500 + 1)) + 1500;
+            collisionOccurred = false;
+
+        }
+        else if (level ==3){
+            startTimer();
+            showWinMessage();
+        }
+
+        level += 1;
+
+    
     }
+}
+
+function startTimer() {
+    // Reset the collision flag for this new level
+    
+    timer = setTimeout(() => {
+        // If the collision flag is still false after 60 seconds, refresh
+        if (!collisionOccurred) {
+            document.getElementById("end-heading").textContent = 'Oh no, too slow!';
+            document.getElementById("end-text").textContent = 'You failed to escape the digital world.';
+            showWinMessage();
+        }
+    }, 20000); 
 }
 
 function animateWalls() {
     const screenWidth = ipadScreen.clientWidth;
     const screenHeight = ipadScreen.clientHeight;
+    
     for (const wall of window.walls || []) {
         let left = parseFloat(wall.style.left);
         let top = parseFloat(wall.style.top);
@@ -486,8 +472,10 @@ function animateWalls() {
         let height = parseFloat(wall.style.height);
 
         // Move wall
-        left += wall.vx;
-        top += wall.vy;
+        if (start){
+            left += wall.vx;
+            top += wall.vy;
+        }
 
         // Bounce off left/right
         if (left <= 0) {
@@ -511,14 +499,7 @@ function animateWalls() {
         wall.style.left = `${left}px`;
         wall.style.top = `${top}px`;
 
-         if (wall.fadeInProgress) {
-            wall.fadeValue += 0.001; // Adjust speed here
-            if (wall.fadeValue >= 1) {
-                wall.fadeValue = 1;
-                wall.fadeInProgress = false;
-            }
-            wall.style.opacity = wall.fadeValue;
-        }
+        
     }
     requestAnimationFrame(animateWalls);
 }

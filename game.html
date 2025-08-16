@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Overstimulation Simulation</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div id="ipadScreen">
+
+  <div id="welcome-screen" class="full-screen-overlay">
+    <div class="welcome-content">
+      <h1>Overstimulation Simulation</h1>
+      <p> Your eyes are trapped in the iPad, but they want to see the world!<br> You can explore with WASD. </p>
+     
+      <button id="startButton">Start</button>
+    </div>
+      <p> <i>A game by Emma Q. Brown</i></p>
+  </div>
+
+  <div class="player" id="player">👀</div>
+
+
+  <div class="friend" id="friend">🌍</div>
+
+  <!-- Distraction Modal -->
+  <div id="distractionModal">
+    <h4>🔔 Notification</h4f>
+    <p id="notification-text"></p>
+  </div>
+  </div>
+
+  <div  id="winMessage" class="full-screen-overlay">
+    <div class="winMessage-content">
+      <h1 id="end-heading">☀️ You escaped! ☀️</h1>
+      <p id="end-text">You escaped the simulation! Now, can you escape it in offline?</p>
+  </div>
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
