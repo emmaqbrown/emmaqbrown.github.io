@@ -225,6 +225,43 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
+let touchStartX = null;
+let touchStartY = null;
+
+function handleTouchStart(e) {
+    const t = e.touches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+}
+
+function handleTouchEnd(e) {
+    if (touchStartX === null || touchStartY === null) return;
+
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    const absDx = Math.abs(dx), absDy = Math.abs(dy);
+
+    // Threshold so accidental taps don’t trigger
+    if (Math.max(absDx, absDy) < 30) return;
+
+    let key = null;
+    if (absDx > absDy) {
+        key = dx > 0 ? 'd' : 'a';
+    } else {
+        key = dy > 0 ? 's' : 'w';
+    }
+
+    const event = new KeyboardEvent('keydown', { key });
+    document.dispatchEvent(event);
+
+    touchStartX = touchStartY = null;
+}
+
+document.addEventListener('touchstart', handleTouchStart, {passive: true});
+document.addEventListener('touchend', handleTouchEnd);
+
+
 
 function createRandomWalls(numWalls = 5) {
     for (const wall of window.walls || []) {
