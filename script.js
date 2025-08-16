@@ -542,7 +542,7 @@ function startTimer() {
             document.getElementById("end-text").textContent = 'You failed to escape the digital world.';
             showWinMessage();
         }
-    }, 60000); 
+    }, 45000); 
 }
 
 function animateWalls() {
