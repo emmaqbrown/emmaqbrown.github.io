@@ -504,7 +504,7 @@ function checkCollision() {
             collisionOccurred = false;
             placePlayer();
             placeFriend();
-            createRandomWalls(20);
+            createRandomWalls(25);
             hideDistractionTime = 2000;
             distractionInterval = Math.floor(Math.random() * (5000 - 3000 + 1)) + 3000;
             collisionOccurred = false;
@@ -542,7 +542,7 @@ function startTimer() {
             document.getElementById("end-text").textContent = 'You failed to escape the digital world.';
             showWinMessage();
         }
-    }, 45000); 
+    }, 15000); 
 }
 
 function animateWalls() {
