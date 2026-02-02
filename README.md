@@ -11,3 +11,4 @@ My personal site.
 - [flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) - center content and create structure to the site
 - https://codepen.io/eqbrown/pen/KwMvzyZ - pop up div
 - https://codepen.io/afa34/pen/VwzxmNN - used hover button animation
+- https://codepen.io/afa34/pen/VwzxmNN - button hover animation
