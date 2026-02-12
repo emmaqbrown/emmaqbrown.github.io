@@ -2,18 +2,34 @@
 <html>
     
   <head>
+    <meta charset="utf-8">
+
     <link rel="stylesheet" href="styles.css">
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.182.0/examples/jsm/"
+        }
+      }
+    </script>
+
   </head>
+  
 
   <body>
+    <div id="info">Score: <span id="score">0</span></div>
 
-   <div class="title">
-    <h1>My fun web site.</h1>
-    </div>
-    <p>Hello, world!</p>
-      
-  <img src="assets/cs_ed.png">
+
+
+    <script type="module" src="/main.js"></script>
+        <!-- <p>blah blah blah</p> -->
 
 
   </body>
+
+
+  
+
 </html>
+

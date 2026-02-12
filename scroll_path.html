@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    
+  <head>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="styles.css">
+    
+     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
+
+      <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/DrawSVGPlugin.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/ScrollTrigger.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/MorphSVGPlugin.min.js"></script>
+
+
+  </head>
+  
+
+  <body>
+    <div id="info">Description</div>
+
+
+    <div class="petal">
+      <h1>TITLE</h1>
+      <p>wowowowo</p>
+      <svg width="270" height="580" viewBox="0 0 270 580" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- <path class="petal4" d="M119.16 122C123.327 83.3333 140.66 10.5 182.16 15.5C208.16 18.6325 152.66 95 119.16 122Z" stroke="#FF0202" stroke-width="10" stroke-linecap="round"/>
+      <path class="petal3" d="M115.66 124.5C110.66 84.5 88.5599 2.80002 72.1599 6.00002C41.1599 26.5 70.0599 93.7 115.66 124.5Z" stroke="#FF0202" stroke-width="10" stroke-linecap="round"/>
+      <path class="petal2" d="M104.995 126.975C77.4947 95.4751 17.9947 46.4751 9.49473 54.9751C-8.50535 81.9751 45.9947 131.475 104.995 126.975Z" stroke="#FF0202" stroke-width="10" stroke-linecap="round"/>
+      <path class="petal1" d="M112.66 133C67.6599 143.5 2.34408 166 6.1599 180.5C16.1599 205.5 69.1599 203 112.66 133Z" stroke="#FF0202" stroke-width="10" stroke-linecap="round"/>
+      <path class="stem" d="M264 574C275.5 535.5 161.5 259 113 127" stroke="#FF0202" stroke-width="10" stroke-linecap="round"/>
+      <path class="petal5" d="M119.16 129C141.66 137 230.325 132 226.66 110.5C219.16 66.5 133.16 106.5 119.16 129Z" stroke="#FF0202" stroke-width="10" stroke-linecap="round"/> -->
+      <path class="test" id="bent-path-id" d="m122,90.5c77,11 159,49 128,123c-31,74 -1,272 104,194c105,-78 110,-376 264,-319" stroke="#FF0202" stroke-width="10" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    </body>
+
+    <script>
+     gsap.registerPlugin(DrawSVGPlugin, ScrollTrigger, MorphSVGPlugin);
+
+      // 1. Define the wiggle animation ONCE outside the scroll trigger
+      const wiggleTl = gsap.timeline({ 
+        paused: true, 
+        yoyo: true, 
+        repeat: -1 
+      });
+
+      wiggleTl.to(".test", { 
+        morphSVG: ".test", 
+        duration: 10, 
+        ease: "sine.inOut" 
+      });
+
+      const animate_scroll = gsap.timeline({
+        scrollTrigger: {
+          trigger: '.petal',
+          scrub: 1.5,
+          start: '50% bottom',
+          end: '90% bottom',
+          onUpdate: (self) => {
+            if (self.progress > 0.99) {
+              // Just play the existing timeline
+              wiggleTl.play();
+            } else {
+              // Pause and smoothly return the path to its original shape
+              wiggleTl.pause();
+              gsap.to(".test", { morphSVG: ".test", duration: 10, ease: "power2.out" });
+            }
+          }
+        }
+      });
+
+    // 2. The drawing part
+    animate_scroll.from(".test", { drawSVG: 0, duration: 1 });
+  </script>
+
+
+</html>
+

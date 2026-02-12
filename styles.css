@@ -1,20 +1,85 @@
 html{
     font-family: serif;
-    background: rgb(253, 254, 246);
+    background: rgb(17, 17, 17);
     margin: 0;
+    height: 500vh; /* Makes the page 5 times taller than the screen */
+
 }
 
 body{
     margin: 0;
-}
-
-
-.title{
-    width: 100%;
-    height: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: black;
-    color: white;
+}
+
+
+
+canvas {
+    position: fixed; /* Keeps the 3D scene stuck to the screen while you scroll */
+    top: 0;
+    left: 0;
+    z-index:5;
+}
+
+#info {
+  position: absolute;
+  text-align: center;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  color: yellow;
+}
+
+p{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -100; /* Place BEHIND the canvas */
+    /* top: 50vh; */
+    color: yellow;
+
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Square+Peg&display=swap');
+
+.petal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200vh;
+  width: 100vw;
+  background-color: #EEC8A4;
+  flex-direction: column;
+}
+
+h1 {
+  /* position: fixed; */
+  font-family: 'Square Peg', cursive;
+  font-size: 10vw;
+  /* top: 50%; */
+  /* left: 50%; */
+  letter-spacing: 1.25px;
+  transform: translate(-50%, -50%);
+  color: #102C6F;
+  z-index: 2;
+}
+
+p{
+    z-index:2;
+}
+
+svg {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  z-index: 1;
+  path {
+    // stroke-width: 10;
+    stroke: #F6854E;
+  }
+  
 }
